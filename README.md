@@ -9,15 +9,22 @@
 # OBJ Model
 First, you need to take the model in .obj format that you want to put inside the game.
 There is an example file in the src folder called "example.obj" like the one below:
+
 ![](https://github.com/AndreaFilippini/GBA_3DEngine/blob/main/images/example.png)
+
 As can be seen, the model has about 250,000 vertices.
+
 Since this number of vertecies is too large to be supported by the GBA console, it's necessary to sample them, taking a subset.
+
 A good range for the number of vertices is between 200 and 500.
 
 # Converto Model to C data
 To convert the model we use the haskell program "vertex.hs" in the src folder.
+
 After starting GHCi, the interactive version of the GHC compiler, at the command prompt, load the module with **:l vertex** command.
+
 Next we can call **:main ObjPath**, where ObjPath is the path to the model you want to convert.
+
 In the haskell main program there are two parameters to be changed according to one's needs:
 - **Scale** in scaleXYZ, a float that rapresents the the scale of the model (put 1 if you don't want to change the scale) 
 - **Resolution** in resolution function, which indicates the sampling interval (e.g., if we put 600 we will have 257087 vertices / 600 = 428 vertices in the final model)
@@ -25,23 +32,31 @@ Once the program runs, a points[][] array of xyz coordinates will be generated t
 
 # 3DEngine
 Once you have downloaded Devkit Pro, you can place the files contained in src inside the **DEVKITARM-R41_WIN32/devkitARM/bin** folder.
+
 The engine is based on projection matrices:
 
 [3D Projection matrices](https://en.wikipedia.org/wiki/3D_projection)
 
 Initially, screen-related parameters are set for proper display using the **main** function.
+
 Inside it, the functions **loadCanvas()** and **loadModelPal()** are called to load the data in BG0 and model palettes, respectively.
+
 The GBA screen has 4 layers called BG ranging from BG0 (highest priority) to BG3 (lowest priority).
+
 Each model coordinate is multiplied by a specific matrix within the **projectPoint** function to obtain the new point coordinate to be displayed on the screen.
+
 The display of individual vertices the **setSanitizePixel()** function is used, which translates the coordinates according to a cartesian reference system starting from the origin (center of the screen) and then calls the **setPixelToCanvas()** function to actually draw the pixel on the screen.
 
 # Compile C code
 To compile the code, it is necessary to call the **casm.bat** file with a single parameter, specifically the path of the 3DEngine .c file.
+
 You need to specify the memory offset where you want to insert the code in the preprocessor directive **#define StartROM** (default value 0x08700000).
+
 The file will initially be converted to an assembly file with the extension .asm and then to a binary file.
+
 Any hex editor can be used to enter the binary file.
 
-Scripting code in the form must be used to invoke the code:
+The scripting code to call the code inserted inside the rom must follow the form::
 
 **#dynamic 0x800000**
 
@@ -51,7 +66,7 @@ Scripting code in the form must be used to invoke the code:
 
 **end**
 
-The insertion of this script is done with the help of a couple of GBA pokémon game hacking tools.
+The insertion of this script is done with the help of a couple of GBA pokémon game hacking tools called **XSE** and **Advance Map**.
 
 # Final Result
 ![](https://github.com/AndreaFilippini/GBA_3DEngine/blob/main/images/example.gif)
