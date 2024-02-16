@@ -141,10 +141,9 @@ struct colorGBA palModels[] = {
 
 void loadCanvas(){
 	int i, k;
-	for(k = 0; k < (160 / 8); k++){
-		for(i = 0; i < (240 / 8); i++){
-			RAWBG0[i + (k*(256/8))] = 0xD000 | (i + (k*(240/8)));
-			
+	for(k = 0; k < (DISPLAY_HEIGHT / 8); k++){
+		for(i = 0; i < (DISPLAY_WIDTH / 8); i++){
+			RAWBG0[i + (k*(BG_STANDARD_WIDTH/8))] = 0xD000 | (i + (k*(DISPLAY_WIDTH/8)));
 		}
 	}
 }
@@ -199,7 +198,6 @@ void endRender(u8 taskId){
 	if (!gPaletteFade.active){
 		DestroyTask(taskId);
 		SetMainCallback2((void*)0x80546F0+1);
-        	//SetMainCallback2((void*)0x080546D4+1);
 	}
 }
 
