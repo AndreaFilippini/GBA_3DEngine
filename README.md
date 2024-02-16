@@ -1,9 +1,10 @@
-# GBA_3DEngine
+# GBA 3DEngine
 3D Engine for GBA, specifically for Pokémon Ruby (USA) game, to visualize 3D models on screen.
 
 # Dependencies
-[Haskell]([url](https://www.haskell.org/))
-[Devkit PRO]([url](https://sourceforge.net/projects/devkitpro/))
+[Haskell](https://www.haskell.org/)
+
+[Devkit PRO](https://sourceforge.net/projects/devkitpro/)
 
 # OBJ Model
 First, you need to take the model in .obj format that you want to put inside the game.
@@ -25,7 +26,8 @@ Once the program runs, a points[][] array of xyz coordinates will be generated t
 # 3DEngine
 Once you have downloaded Devkit Pro, you can place the files contained in src inside the **DEVKITARM-R41_WIN32/devkitARM/bin** folder.
 The engine is based on projection matrices:
-[3D Projection matrices]([url](https://en.wikipedia.org/wiki/3D_projection))
+
+[3D Projection matrices](https://en.wikipedia.org/wiki/3D_projection)
 
 Initially, screen-related parameters are set for proper display using the **main** function.
 Inside it, the functions **loadCanvas()** and **loadModelPal()** are called to load the data in BG0 and model palettes, respectively.
@@ -41,10 +43,13 @@ Any hex editor can be used to enter the binary file.
 
 Scripting code in the form must be used to invoke the code:
 
-**#dynamic 0x800000
-#org @start
-callasm 0xStartROM+1
-end**
+**#dynamic 0x800000**
+
+**#org @start**
+
+**callasm 0xStartROM+1**
+
+**end**
 
 The insertion of this script is done with the help of a couple of GBA pokémon game hacking tools.
 
