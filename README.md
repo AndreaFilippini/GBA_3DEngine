@@ -2,7 +2,7 @@
 3D Engine for GBA, specifically for Pokémon Ruby (USA) game, to visualize 3D models on screen.
 
 # Dependencies
-[Haskell](https://www.haskell.org/)
+[VB.NET](https://learn.microsoft.com/it-it/dotnet/visual-basic/) or [Haskell](https://www.haskell.org/)
 
 [Devkit PRO](https://sourceforge.net/projects/devkitpro/)
 
@@ -18,9 +18,23 @@ Since this number of vertecies is too large to be supported by the GBA console, 
 
 A good range for the number of vertices is between 200 and 500.
 
-# Converto Model to C data
-To convert the model we use the haskell program "vertex.hs" in the src folder.
+# Convert Model to C data
+To convert the model to a suitable C data we can use two converters:
+- the haskell program "vertex.hs" in the **src/modConv/haskellConv** folder
+- the executable file "createData.exe" in the **src/modConv/VBConv** folder
+Once either program has been executed, a txt file containing a points[][] matrix of xyz coordinates will be generated to and which can be inserted directly into our C code with a simple import directive.
 
+# Convert Model with VB.NET
+To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 arg2** where:
+- arg0 contains the **path** of the model with .obj extension
+- arg1 contains the **scale**, a float that rapresents the the scale of the model (put 1 if you don't want to change the scale) 
+- arg2 contains the **resolution**, which indicates the sampling interval (e.g., if we put 600 we will have 257087 vertices / 600 = 428 vertices in the final model)
+
+Once the program runs, a txt file containing a points[][] matrix of xyz coordinates will be generated to and which can be inserteddirectly into our C code.
+
+You can view the source code of executble in "Module1.vb" file in the same folder.
+
+# Convert Model with Haskell
 After starting GHCi, the interactive version of the GHC compiler, at the command prompt, load the module with **:l vertex** command.
 
 Next we can call **:main ObjPath**, where ObjPath is the path to the model you want to convert.
@@ -28,7 +42,6 @@ Next we can call **:main ObjPath**, where ObjPath is the path to the model you w
 In the haskell main program there are two parameters to be changed according to one's needs:
 - **Scale** in scaleXYZ, a float that rapresents the the scale of the model (put 1 if you don't want to change the scale) 
 - **Resolution** in resolution function, which indicates the sampling interval (e.g., if we put 600 we will have 257087 vertices / 600 = 428 vertices in the final model)
-Once the program runs, a points[][] array of xyz coordinates will be generated to be inserted directly into our C code.
 
 # 3DEngine
 Once you have downloaded Devkit Pro, you can place the files contained in src inside the **DEVKITARM-R41_WIN32/devkitARM/bin** folder.
