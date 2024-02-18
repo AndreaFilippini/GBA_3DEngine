@@ -22,6 +22,7 @@ A good range for the number of vertices is between 200 and 500.
 To convert the model to a suitable C data we can use two converters:
 - the haskell program "vertex.hs" in the **src/modConv/haskellConv** folder
 - the executable file "createData.exe" in the **src/modConv/VBConv** folder
+
 Once either program has been executed, a txt file containing a points[][] matrix of xyz coordinates will be generated to and which can be inserted directly into our C code with a simple import directive.
 
 # Convert Model with VB.NET
@@ -30,9 +31,7 @@ To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 arg
 - arg1 contains the **scale**, a float that rapresents the the scale of the model (put 1 if you don't want to change the scale) 
 - arg2 contains the **resolution**, which indicates the sampling interval (e.g., if we put 600 we will have 257087 vertices / 600 = 428 vertices in the final model)
 
-Once the program runs, a txt file containing a points[][] matrix of xyz coordinates will be generated to and which can be inserteddirectly into our C code.
-
-You can view the source code of executble in "Module1.vb" file in the same folder.
+You can view the source code of executable in "Module1.vb" file in the same folder.
 
 # Convert Model with Haskell
 After starting GHCi, the interactive version of the GHC compiler, at the command prompt, load the module with **:l vertex** command.
