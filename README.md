@@ -23,7 +23,7 @@ To convert the model to a suitable C data we can use the executable file "create
 
 Once the program has been executed, a txt file containing a points[] array of xyz triangles will be generated to and which can be inserted directly into our C code with a simple import directive.
 
-Each triangle is represented by three consecutive points int the generated array.
+Each triangle is represented by three consecutive points in the generated array.
 
 # Convert Model with VB.NET
 To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 arg2** where:
