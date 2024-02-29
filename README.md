@@ -44,7 +44,7 @@ After that, in the main loop, we proceed to display the model on the screen with
 
 Each point of a triangle is multiplied by a specific matrix in the **projectPoint** function to obtain the coordinates of the new triangle to be displayed on the screen.
 
-The display of individual vertices the **setSanitizePixel()** function is used, which translates the coordinates according to a cartesian reference system starting from the origin (center of the screen) and then calls the **setPixelToCanvas()** function to actually draw the pixel on the screen.
+**SetSanitizePixel()** function is used to display individual vertices, which translates the coordinates according to a cartesian reference system starting from the origin (center of the screen) and then calls the **setPixelToCanvas()** function to actually draw the pixel on the screen.
 
 # Compile C code to GBA ROM
 To compile the code, it is necessary to call the only **gbac.bat**.
