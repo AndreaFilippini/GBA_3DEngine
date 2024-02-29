@@ -19,7 +19,7 @@ A good range for the number of polygons (triangles) is between 200 and 500.
 The number of polygons is given at the end of the obj file as an annotation (e.g. # 400 polygons).
 
 # Convert Model to C data
-To convert the model to a suitable C data we can use the executable file "createData.exe" in the **src/modConv/VBConv** folder.
+To convert the model to a suitable C data we can use the executable file "createData.exe" in the **src/modConv** folder.
 
 Once either program has been executed, a txt file containing a points[] array of xyz triangles will be generated to and which can be inserted directly into our C code with a simple import directive.
 
