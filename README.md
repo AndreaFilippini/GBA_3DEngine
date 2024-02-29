@@ -16,7 +16,7 @@ Since this number of polygons in most of the models is too large to be supported
 
 A good range for the number of polygons (triangles) is between 200 and 500.
 
-The number of polygons is given at the end of the obj file as an annotation (e.g. # 400 polygons).
+The number of polygons is given at the end of each model in the obj file as an annotation (e.g. # 400 polygons).
 
 # Convert Model to C data
 To convert the model to a suitable C data we can use the executable file "createData.exe" in the **src/modConv** folder.
