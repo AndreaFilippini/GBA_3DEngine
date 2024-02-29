@@ -2,26 +2,28 @@
 3D Engine for GBA to visualize 3D models on screen.
 
 # Dependencies
-[VB.NET](https://learn.microsoft.com/it-it/dotnet/visual-basic/)
+[VB.NET](https://learn.microsoft.com/it-it/dotnet/visual-basic/) (only if you want to edit the obj converter)
 
 [Devkit PRO](https://sourceforge.net/projects/devkitpro/)
 
 # OBJ Model
-First, you need to take the model in .obj format that you want to put inside the game.
+First, you need to take the model in .obj format that you want to visualize.
 There is an example file in the src folder called "example.obj" like the one below:
 
 ![](https://github.com/AndreaFilippini/GBA_3DEngine/blob/main/images/example.png)
 
-Since this number of polygons in most of the models is too large to be supported by the GBA console, it's necessary to sample them, taking a subset with a converter.
+Since this number of polygons in most of the models is too large to be supported and displayed in real time by the GBA console, it's necessary to sample them, taking a subset with a converter.
 
-A good range for the number of polygons (triangles) is between 200 and 500.
+A good range for the number of polygons (triangles) is between 20 and 50.
 
 The number of polygons is given at the end of each model in the obj file as an annotation (e.g. # 400 polygons).
 
 # Convert Model to C data
 To convert the model to a suitable C data we can use the executable file "createData.exe" in the **src/modConv** folder.
 
-Once either program has been executed, a txt file containing a points[] array of xyz triangles will be generated to and which can be inserted directly into our C code with a simple import directive.
+Once the program has been executed, a txt file containing a points[] array of xyz triangles will be generated to and which can be inserted directly into our C code with a simple import directive.
+
+Each triangle is represented by three consecutive points int the generated array.
 
 # Convert Model with VB.NET
 To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 arg2** where:
@@ -47,7 +49,7 @@ Each point of a triangle is multiplied by a specific matrix in the **projectPoin
 **SetSanitizePixel()** function is used to display individual vertices, which translates the coordinates according to a cartesian reference system starting from the origin (center of the screen) and then calls the **setPixelToCanvas()** function to actually draw the pixel on the screen.
 
 # Compile C code to GBA ROM
-To compile the code, it is necessary to call the only **gbac.bat**.
+To compile the code, it's necessary to call **gbac.bat**.
 The bat file will execute all the necessary compilers in the DevKitARM folder, going from the C file to an asm file, moving to an elf file, and finally to the final rom with **gba** extension.
 
 # Final Result
