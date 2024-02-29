@@ -1,7 +1,7 @@
 #include "lib/gba_types.h"
 #include "lib/gba_keys.h"
 #include "lib/gba_regs.h"
-#include "lib/gba_io.h"
+#include "lib/main.h"
 #include "lib/macro.h"
 #include "lib/defines.h"
 #include "lib/math.h"
@@ -49,11 +49,9 @@ struct colorGBA palModels[] = {
 
 int main();
 void initScreenValue();
-void loadCanvas();
 void loadModelPal();
 void initZBuffer();
 void render3D(u16 angle, u8 model, int vertexNum);
-struct point *sanitizeCoords(struct point *p);
 void setSanitizePixel(struct point *p, u16 color);
 void setPixelToCanvas(u8 x, u8 y, u8 color);
 u16 getPixelOfCanvas(struct point *p);
@@ -63,9 +61,6 @@ void drawLine(struct point *p1, struct point *p2, u16 color);
 void drawTriangle(struct triangle *t, u16 color, u8 fill);
 void fillTriangle(struct triangle *t, u16 color, u8 fill);
 u8 calcLightValue(s16 z);
-int abs(int a);
-s16 Sin2(u16 angle);
-s16 Cos2(u16 angle);
 void resetScreen();
 void refreshModelValue(u8 model, int *totalPoints);
 int getVertexNum(u8 model);
@@ -347,13 +342,13 @@ void setSanitizePixel(struct point *p, u16 color){
 	}
 }
 
-void setPixelToCanvas(u8 x, u8 y, u8 color){
-	CANVAS[x + y*DISPLAY_WIDTH] = SETPAL[color];
-}
-
 u16 getPixelOfCanvas(struct point *p){
 	struct point newPoint = translatePoint(p);
 	return CANVAS[newPoint.x + newPoint.y*DISPLAY_WIDTH];
+}
+
+void setPixelToCanvas(u8 x, u8 y, u8 color){
+	CANVAS[x + y*DISPLAY_WIDTH] = SETPAL[color];
 }
 
 void setZBuffer(struct point *p){
