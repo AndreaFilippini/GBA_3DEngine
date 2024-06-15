@@ -6,6 +6,9 @@
 #include "lib/defines.h"
 #include "lib/math.h"
 
+//#include "_house.h"	//random obj
+#include "_torus.h"	//torus
+
 struct point{
 	s16 x;
 	s16 y;
@@ -45,9 +48,6 @@ struct triangle{
 #define minDepth 	(*(s16*)(StartRAM + 0x10))
 #define maxDepth 	(*(s16*)(StartRAM + 0x12))
 #define vertexPos	((struct point*)(StartRAM + 0x14))
-
-//#include "_house.h"	//random obj
-#include "_torus.h"	//torus
 
 int main();
 void initScreenValue();
