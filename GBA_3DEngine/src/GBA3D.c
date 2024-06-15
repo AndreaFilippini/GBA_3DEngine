@@ -46,8 +46,8 @@ struct triangle{
 #define maxDepth 	(*(s16*)(StartRAM + 0x12))
 #define vertexPos	((struct point*)(StartRAM + 0x14))
 
-#include "_torus.h"	//torus
 //#include "_house.h"	//random obj
+#include "_torus.h"	//torus
 
 int main();
 void initScreenValue();
