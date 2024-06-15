@@ -1,13 +1,10 @@
+#include "lib/gba_types.h"
+#include "lib/gba_keys.h"
+#include "lib/gba_regs.h"
 #include "lib/main.h"
 #include "lib/macro.h"
 #include "lib/defines.h"
 #include "lib/math.h"
-#include "lib/gba_types.h"
-#include "lib/gba_keys.h"
-#include "lib/gba_regs.h"
-
-//#include "_house.h"	//random obj
-#include "_torus.h"	//torus
 
 struct point{
 	s16 x;
@@ -67,6 +64,9 @@ int getVertexNum();
 s16 getZBuffer(struct point *p);
 void setZBuffer(struct point *p);
 void setDepthRange();
+
+//#include "_house.h"	//random obj
+#include "_torus.h"	//torus
 
 int main(){
 
