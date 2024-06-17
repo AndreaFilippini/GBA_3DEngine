@@ -65,8 +65,8 @@ s16 getZBuffer(struct point *p);
 void setZBuffer(struct point *p);
 void setDepthRange();
 
-//#include "_house.h"	//random obj
 #include "_torus.h"	//torus
+//#include "_house.h"	//random obj
 
 int main(){
 
