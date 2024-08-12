@@ -80,8 +80,8 @@ Module Module1
                 counter += 1
 
             ElseIf (splittedLine(0) = "f") Then
-                ' otherwise If it's a face, filter the parts of which it is composed, removing unnecessary parts,
-                ' and creates triangles based on the value of the vertices For the current face
+                'otherwise If it's a face, filter the parts of which it is composed, removing unnecessary parts,
+                'and creates triangles based on the value of the vertices For the current face
                 Dim cleanSplit As New ArrayList
                 For Each part In splittedLine
                     If part <> "" And part <> " " Then cleanSplit.Add(part)
@@ -105,7 +105,7 @@ Module Module1
                     Dim processedVertexIndex As String = Replace(vertexIndex, "//", "/").Split("/")(0)
                     currentVertex = Replace(vertexList(processedVertexIndex - 1), ".", ",").Split
 
-                    ' get final xyz values, multiplying them by the scale value
+                    'get final xyz values, multiplying them by the scale value
                     roundX = (currentVertex(1) * scale)
                     tempNum = Math.Round(Convert.ToDouble(roundX), 0)
                     roundX = tempNum.ToString
@@ -116,7 +116,7 @@ Module Module1
                     tempNum = Math.Round(Convert.ToDouble(roundZ), 0)
                     roundZ = tempNum.ToString
 
-                    ' for Each vertex, add the part that encodes it into the final C Structure
+                    'for each vertex, add the part that encodes it into the final C Structure
                     finalString += "	" + "[" + indexNum.ToString + "] = {.x = " + roundX + ", .y = " + roundY + ", .z =  " + roundZ + ", RGB(" +
                                         (r >> 3).ToString + ", " + (g >> 3).ToString + ", " + (b >> 3).ToString + ")}," + vbCrLf
 
