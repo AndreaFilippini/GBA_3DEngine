@@ -5,7 +5,7 @@ import os
 # class used to limit the values of the range of arguments related to the texture color of the model
 class rgbRange(argparse.Action):
     def __call__(self, parser, namespace, values, option_steing=None):
-        if values not in range(0,255):
+        if values not in range(0,256):
             parser.exit(1, message= f"'ERROR: {self.dest}' should be in [0-255]")
         setattr(namespace, self.dest, values)
 
