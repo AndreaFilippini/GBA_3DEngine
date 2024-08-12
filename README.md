@@ -2,21 +2,25 @@
 3D Engine for GBA to visualize 3D models on screen.
 
 # Dependencies
+[Devkit PRO](https://sourceforge.net/projects/devkitpro/)
+
 [VB.NET](https://learn.microsoft.com/it-it/dotnet/visual-basic/) (only if you want to edit the obj converter)
 
-[Devkit PRO](https://sourceforge.net/projects/devkitpro/)
+[Python](https://www.python.org/) (only if you don't want to use the VB converter or you want to edit the python converter)
 
 # OBJ Model, Conversion and Data Structure
 First, you need to take the model in .obj format that you want to visualize.
 
-To convert the model to a suitable C data we can use the executable file "createData.exe" in the **src/modConv** folder.
+To convert the model to a suitable C data you can use the executable file "createData.exe" in the **src/modConv/VB** folder.
 
-Once the program has been executed, a txt file containing an array of points will be generated to and which can be inserted directly into our C code with a simple import directive.
+Alternatively, you can use the script "createData.py" in the **src/modConv/python** folder.
+
+Once the program or the python script has been executed, a txt file containing an array of points will be generated to and which can be inserted directly into our C code with a simple import directive.
 
 Each triangle is represented by three consecutive points in the generated array.
 
 # Convert OBJ Model to C data
-To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 r g b** where:
+To convert the OBJ model with the VB converter, open the CMD prompt and type **createData arg0 arg1 r g b** where:
 - arg0 contains the **path** of the model with .obj extension
 - arg1 contains the **scale**, a float that rapresents the the scale of the model (put 1 if you don't want to change the scale) 
 - r,g,b represent the base color of the model, with values ranging from 0 to 255
@@ -24,6 +28,10 @@ To convert the OBJ model open the CMD prompt and type **createData arg0 arg1 r g
 For example, if you have torus in your obj file and you want its size to be half the original and with white as the base color just write ***createData torus.obj 0,5 255 255 255***.
 
 You can view the source code of executable in "Module1.vb" file in the same folder.
+
+In case you wanted to use the python converter, open the CMD prompt and type **python createData.py -path arg0 -scl arg1 -r r -g g -b b** where ***arg0 arg1 r g b*** have the same meaning as shown above.
+
+If you want to get the same result as before, just write ***python createData.py -path torus.obj -scl 0.5 -r 255 -g 255 -b 255***.
 
 # 3DEngine
 Once you have downloaded Devkit Pro, you can place the files contained in src inside the **DEVKITARM-R41_WIN32/devkitARM/bin** folder.
