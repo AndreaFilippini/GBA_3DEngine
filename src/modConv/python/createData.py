@@ -54,6 +54,7 @@ try:
     obj_file = open(path, "r").read()
 except:
     print(f"ERROR: Could not open {path}")
+    sys.exit()
 
 # init accumulators of the vertices and faces of the model
 vertex_list, face_list = [], []
