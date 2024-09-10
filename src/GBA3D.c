@@ -4,7 +4,7 @@
 #include "lib/main.h"
 #include "lib/macro.h"
 #include "lib/defines.h"
-#include "lib/math2.h"
+#include "lib/math.h"
 
 struct point{
 	s16 x;
@@ -73,7 +73,7 @@ int main(){
 	initScreenValue();
 
 	for(;;){
-		angleValue += 1;
+		angleValue += 3;
 		if(angleValue >= 360)
 			angleValue = 0;
 
