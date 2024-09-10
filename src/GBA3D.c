@@ -4,7 +4,7 @@
 #include "lib/main.h"
 #include "lib/macro.h"
 #include "lib/defines.h"
-#include "lib/math.h"
+#include "lib/math2.h"
 
 struct point{
 	s16 x;
@@ -46,6 +46,9 @@ struct triangle{
 #define maxDepth 	(*(s16*)(StartRAM + 0x12))
 #define vertexPos	((struct point*)(StartRAM + 0x14))
 
+//#include "_house.h"	//random obj
+#include "_torus.h"	//torus
+
 int main();
 void initScreenValue();
 void initZBuffer();
@@ -65,18 +68,15 @@ s16 getZBuffer(struct point *p);
 void setZBuffer(struct point *p);
 void setDepthRange();
 
-#include "_torus.h"	//torus
-//#include "_house.h"	//random obj
-
 int main(){
 
 	initScreenValue();
 
 	for(;;){
-		angleValue += 3;
+		angleValue += 1;
 		if(angleValue >= 360)
 			angleValue = 0;
-		
+
 		render3D(angleValue);
 	}
 }
@@ -110,12 +110,11 @@ void setDepthRange(){
 }
 
 void initZBuffer(){
-	int i, k;
-	for(k = 0; k < DISPLAY_HEIGHT; k++){
-		for(i = 0; i < DISPLAY_WIDTH; i++){
-			ZBUFFER[i + k*DISPLAY_WIDTH] = DEPTH_LIMIT;
-		}
+	int k;
+	for(k = 0; k < (DISPLAY_WIDTH * DISPLAY_HEIGHT); k++){
+		ZBUFFER[k] = DEPTH_LIMIT;
 	}
+	
 }
 
 void resetScreen(){
@@ -152,6 +151,7 @@ void render3D(u16 angle){
 	//draw triangles
 	int vertexNum = getVertexNum();
 	for (i = 0; i < vertexNum; i+=3){
+
 		for(k = 0; k < 3; k++){
 			pointer = (struct point *)&points[i + k];
 
@@ -166,11 +166,12 @@ void render3D(u16 angle){
 
 			vertexPos[i+k] = p3;
 		}
+
 		drawTriangle(&tNew, calcLightValue((tNew.p1.z + tNew.p2.z + tNew.p3.z) / 3));
 	}
 
 	//copy from buffer to screen
-	DmaCopy16(3, VID_CANVAS, CANVAS, ((DISPLAY_WIDTH * DISPLAY_HEIGHT)*2));
+	DmaCopy32(3, VID_CANVAS, CANVAS, ((DISPLAY_WIDTH * DISPLAY_HEIGHT)*2));
 }
 
 struct point projectPoint(struct point *p, u16 angle, u8 table){
@@ -180,19 +181,19 @@ struct point projectPoint(struct point *p, u16 angle, u8 table){
 		//rotate on X
 		case 0:
 			newPoint.x = p->x * scalingValue;
-			newPoint.y = ((p->y * Cos2(angle)) / 4096 + (p->z * Sin2(angle)) / 4096) * scalingValue;
-			newPoint.z = ((p->y * -Sin2(angle)) / 4096 + (p->z * Cos2(angle)) / 4096) * scalingValue;
+			newPoint.y = ((p->y * Cos2(angle)) + (p->z * Sin2(angle))) * scalingValue;
+			newPoint.z = ((p->y * -Sin2(angle)) + (p->z * Cos2(angle))) * scalingValue;
 		break;
 		//rotate on Y
 		case 1:
-			newPoint.x = ((p->x * Cos2(angle)) / 4096 +  (p->z * Sin2(angle)) / 4096) * scalingValue;
+			newPoint.x = ((p->x * Cos2(angle)) +  (p->z * Sin2(angle))) * scalingValue;
 			newPoint.y = p->y * scalingValue;
-			newPoint.z = ((p->x * -Sin2(angle)) / 4096 + (p->z * Cos2(angle)) / 4096) * scalingValue;
+			newPoint.z = ((p->x * -Sin2(angle)) + (p->z * Cos2(angle))) * scalingValue;
 		break;
 		default:
 		//rotate on XY
-			newPoint.x = ((p->x * Cos2(angle)) / 4096 + (p->y * Sin2(angle)) / 4096) * scalingValue;
-			newPoint.y = ((p->x * -Sin2(angle)) / 4096 + (p->y * Cos2(angle)) / 4096) * scalingValue;
+			newPoint.x = ((p->x * Cos2(angle)) + (p->y * Sin2(angle))) * scalingValue;
+			newPoint.y = ((p->x * -Sin2(angle)) + (p->y * Cos2(angle))) * scalingValue;
 			newPoint.z = p->z * scalingValue;
 		break;
 	}
@@ -283,15 +284,15 @@ struct point translatePoint(struct point *p){
 
 	//translate from origin
 	if(p->x >= 0){
-		newX = ((DISPLAY_WIDTH / 2) + p->x);
+		newX = ((DISPLAY_WIDTH >> 1) + p->x);
 	}else{
-		newX = ((DISPLAY_WIDTH / 2) - (p->x * -1));
+		newX = ((DISPLAY_WIDTH >> 1) - (p->x * -1));
 	}
 
 	if(p->y >= 0){
-		newY = ((DISPLAY_HEIGHT / 2) - p->y);
+		newY = ((DISPLAY_HEIGHT >> 1) - p->y);
 	}else{
-		newY = ((DISPLAY_HEIGHT / 2) + (p->y * -1));
+		newY = ((DISPLAY_HEIGHT >> 1) + (p->y * -1));
 	}
 
 	struct point newPoint = {newX + translateX, newY + translateY, p->z, p->color};
