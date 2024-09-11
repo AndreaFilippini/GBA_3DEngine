@@ -28,7 +28,6 @@ struct triangle{
 #define ZBUFFER		((s16*)0x02030000)
 #define CANVAS		((u16*)0x06000000)
 #define VID_CANVAS	((u16*)0x02050000)
-//#define VID_CANVAS	((u16*)0x06000000)
 
 #define SETPAL 		((u16*)0x05000000)
 #define DEPTH_LIMIT	-2000
@@ -243,7 +242,7 @@ void drawLine(struct point *p1, struct point *p2, u16 color){
 	struct point p;
 
 	while(1){
-		p.x = x0; p.y = y0; p.z = p1->z; p.color = p1->color; 
+		p = (struct point){x0, y0, p1->z, p1->color};
 
 		setSanitizePixel(&p, color);
 
@@ -280,10 +279,6 @@ void setSanitizePixel(struct point *p, s16 color){
 		if ((newPoint.y <= DISPLAY_HEIGHT) && (newPoint.y > yMaxVal)){
 			yMaxVal = newPoint.y;
 		}
-		(*(s16*)0x02024f50) = xMinVal;
-		(*(s16*)0x02024f52) = xMaxVal;
-		(*(s16*)0x02024f54) = yMinVal;
-		(*(s16*)0x02024f56) = yMaxVal;
 	}
 }
 
@@ -379,7 +374,6 @@ void fillTriangle(struct triangle *t, s16 color){
 			e3 = seg5 * (y - t->p3.y) - seg6 * (x - t->p3.x);
 
 			if(((e1 < 0) && (e2 < 0) && (e3 < 0)) ){
-			//if( ((e1 > 0) && (e2 > 0) && (e3 > 0)) || ((e1 < 0) && (e2 < 0) && (e3 < 0)) ){
                			p.x = x; p.y = y;
 				setSanitizePixel(&p, color);
             		}
