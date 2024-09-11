@@ -28,6 +28,7 @@ struct triangle{
 #define ZBUFFER		((s16*)0x02030000)
 #define CANVAS		((u16*)0x06000000)
 #define VID_CANVAS	((u16*)0x02050000)
+//#define VID_CANVAS	((u16*)0x06000000)
 
 #define SETPAL 		((u16*)0x05000000)
 #define DEPTH_LIMIT	-2000
@@ -44,7 +45,12 @@ struct triangle{
 #define scalingValue	(*(float*)(StartRAM + 0x0C))
 #define minDepth 	(*(s16*)(StartRAM + 0x10))
 #define maxDepth 	(*(s16*)(StartRAM + 0x12))
-#define vertexPos	((struct point*)(StartRAM + 0x14))
+#define vertexCount	(*(int*)(StartRAM + 0x14))
+#define xMinVal		(*(u16*)(StartRAM + 0x18))
+#define yMinVal		(*(u16*)(StartRAM + 0x1A))
+#define xMaxVal		(*(u16*)(StartRAM + 0x1C))
+#define yMaxVal		(*(u16*)(StartRAM + 0x1E))
+#define vertexPos	((struct point*)(StartRAM + 0x20))
 
 //#include "_house.h"	//random obj
 #include "_torus.h"	//torus
@@ -63,17 +69,16 @@ void drawTriangle(struct triangle *t, s16 color);
 void fillTriangle(struct triangle *t, s16 color);
 s16 calcLightValue(s16 z);
 void resetScreen();
-int getVertexNum();
+void resetClearBound();
 s16 getZBuffer(struct point *p);
 void setZBuffer(struct point *p);
 void setDepthRange();
 
 int main(){
-
 	initScreenValue();
 
 	for(;;){
-		angleValue += 3;
+		angleValue += 1;
 		if(angleValue >= 360)
 			angleValue = 0;
 
@@ -87,18 +92,29 @@ void initScreenValue(){
 	angleValue = 210;
 	translateX = 0;
 	translateY = 0;
-	scalingValue = 0.7;
+	scalingValue = 0.5;
 
+	vertexCount = (sizeof(points) / (sizeof(struct triangle) / 3));
+
+	resetClearBound();
+	initZBuffer();
 	setDepthRange();
+}
+
+void resetClearBound(){
+	xMinVal = DISPLAY_WIDTH;
+	yMinVal = DISPLAY_HEIGHT;
+	yMaxVal = 0;
+	yMaxVal = 0;
 }
 
 void setDepthRange(){
 	//find min and max z depth in the model
 	struct point *pointer;
 	s16 minValue = 0, maxValue = 0;
-	int i, vertexNum = getVertexNum();
-	for (i = 0; i < vertexNum; i++){
-		pointer = (struct point *)&points[i];
+	int i;
+	for (i = 0; i < vertexCount; i++){
+		pointer = &points[i];
 		if(pointer->z < minValue){
 			minValue = pointer->z;
 		}else if(pointer->z > maxValue){
@@ -114,15 +130,18 @@ void initZBuffer(){
 	for(k = 0; k < (DISPLAY_WIDTH * DISPLAY_HEIGHT); k++){
 		ZBUFFER[k] = DEPTH_LIMIT;
 	}
-	
 }
 
 void resetScreen(){
-	int k;
-	for(k = 0; k < (DISPLAY_WIDTH * DISPLAY_HEIGHT); k++){
-		VID_CANVAS[k] = 0;
-		ZBUFFER[k] = DEPTH_LIMIT;
+	int j, k;
+	for(j = yMinVal; j <= yMaxVal; j++){
+		for(k = xMinVal; k <= xMaxVal; k++){
+			VID_CANVAS[k+j*DISPLAY_WIDTH] = 0;
+			ZBUFFER[k+j*DISPLAY_WIDTH] = DEPTH_LIMIT;
+		}
 	}
+	
+	resetClearBound();
 }
 
 s16 calcLightValue(s16 z){
@@ -135,39 +154,46 @@ s16 calcLightValue(s16 z){
 	return newValue;
 }
 
-int getVertexNum(){
-	return (sizeof(points) / (sizeof(struct triangle) / 3));
-}
-
 void render3D(u16 angle){
 	int i, k;
 	u8 lightVal;
 
-	struct triangle tNew;
-	struct point *pointer, p3;
+	struct triangle *tNew;
+	struct point *pointer, p3d, seg1, seg2, norm;
 
 	resetScreen();
 
 	//draw triangles
-	int vertexNum = getVertexNum();
-	for (i = 0; i < vertexNum; i+=3){
+	for (i = 0; i < vertexCount; i+=3){
 
 		for(k = 0; k < 3; k++){
-			pointer = (struct point *)&points[i + k];
+			pointer = &points[i + k];
 
-			p3 = projectPoint(pointer, angle, 0);
-			p3 = projectPoint(&p3, angle, 1);
+			p3d = projectPoint(pointer, angle, 0);
+			p3d = projectPoint(&p3d, angle, 1);
 
-			switch (k){
-				case 0: tNew.p1 = p3; break;
-				case 1: tNew.p2 = p3; break;
-				default: tNew.p3 = p3; break;
-			};
+			p3d.x *= scalingValue;
+			p3d.y *= scalingValue;
+			p3d.z *= scalingValue;
 
-			vertexPos[i+k] = p3;
+			vertexPos[i+k] = p3d;
 		}
 
-		drawTriangle(&tNew, calcLightValue((tNew.p1.z + tNew.p2.z + tNew.p3.z) / 3));
+		tNew = (struct triangle *)&vertexPos[i];
+
+		// calculate normal direction
+		seg1.x = vertexPos[i+1].x - vertexPos[i].x;
+		seg1.y = vertexPos[i+1].y - vertexPos[i].y;
+		seg1.z = vertexPos[i+1].z - vertexPos[i].z;
+		seg2.x = vertexPos[i+2].x - vertexPos[i].x;
+		seg2.y = vertexPos[i+2].y - vertexPos[i].y;
+		seg2.z = vertexPos[i+2].z - vertexPos[i].z;
+		norm.z = seg1.x * seg2.y - seg1.y * seg2.x;
+
+		// shows triangles whose normal points to the camera
+		if (norm.z > 0){
+			drawTriangle(tNew, calcLightValue((tNew->p1.z + tNew->p2.z + tNew->p3.z) / 3));
+		}
 	}
 
 	//copy from buffer to screen
@@ -180,26 +206,26 @@ struct point projectPoint(struct point *p, u16 angle, u8 table){
 	switch (table){
 		//rotate on X
 		case 0:
-			newPoint.x = p->x * scalingValue;
-			newPoint.y = ((p->y * Cos2(angle)) + (p->z * Sin2(angle))) * scalingValue;
-			newPoint.z = ((p->y * -Sin2(angle)) + (p->z * Cos2(angle))) * scalingValue;
+			newPoint.x = p->x;
+			newPoint.y = (p->y * Cos2(angle)) + (p->z * Sin2(angle));
+			newPoint.z = (p->y * -Sin2(angle)) + (p->z * Cos2(angle));
 		break;
 		//rotate on Y
 		case 1:
-			newPoint.x = ((p->x * Cos2(angle)) +  (p->z * Sin2(angle))) * scalingValue;
-			newPoint.y = p->y * scalingValue;
-			newPoint.z = ((p->x * -Sin2(angle)) + (p->z * Cos2(angle))) * scalingValue;
+			newPoint.x = (p->x * Cos2(angle)) +  (p->z * Sin2(angle));
+			newPoint.y = p->y;
+			newPoint.z = (p->x * -Sin2(angle)) + (p->z * Cos2(angle));
 		break;
 		default:
 		//rotate on XY
-			newPoint.x = ((p->x * Cos2(angle)) + (p->y * Sin2(angle))) * scalingValue;
-			newPoint.y = ((p->x * -Sin2(angle)) + (p->y * Cos2(angle))) * scalingValue;
-			newPoint.z = p->z * scalingValue;
+			newPoint.x = (p->x * Cos2(angle)) + (p->y * Sin2(angle));
+			newPoint.y = (p->x * -Sin2(angle)) + (p->y * Cos2(angle));
+			newPoint.z = p->z;
 		break;
 	}
 
 	newPoint.color = p->color;
-	return newPoint;	
+	return newPoint;
 }
 
 //Bresenham's line algorithm
@@ -242,6 +268,22 @@ void setSanitizePixel(struct point *p, s16 color){
 	if (newPoint.z > getZBuffer(&newPoint)){
 		setZBuffer(&newPoint);
 		setPixelToCanvas(newPoint.x, newPoint.y, newPoint.color, color);
+		if ((newPoint.x > 0) && (newPoint.x < xMinVal)){
+			xMinVal = newPoint.x;
+		}
+		if ((newPoint.x <= DISPLAY_WIDTH) && (newPoint.x > xMaxVal)){
+			xMaxVal = newPoint.x;
+		}
+		if ((newPoint.y > 0) && (newPoint.y < yMinVal)){
+			yMinVal = newPoint.y;
+		}
+		if ((newPoint.y <= DISPLAY_HEIGHT) && (newPoint.y > yMaxVal)){
+			yMaxVal = newPoint.y;
+		}
+		(*(s16*)0x02024f50) = xMinVal;
+		(*(s16*)0x02024f52) = xMaxVal;
+		(*(s16*)0x02024f54) = yMinVal;
+		(*(s16*)0x02024f56) = yMaxVal;
 	}
 }
 
@@ -286,13 +328,13 @@ struct point translatePoint(struct point *p){
 	if(p->x >= 0){
 		newX = ((DISPLAY_WIDTH >> 1) + p->x);
 	}else{
-		newX = ((DISPLAY_WIDTH >> 1) - (p->x * -1));
+		newX = ((DISPLAY_WIDTH >> 1) - (-p->x));
 	}
 
 	if(p->y >= 0){
 		newY = ((DISPLAY_HEIGHT >> 1) - p->y);
 	}else{
-		newY = ((DISPLAY_HEIGHT >> 1) + (p->y * -1));
+		newY = ((DISPLAY_HEIGHT >> 1) + (-p->y));
 	}
 
 	struct point newPoint = {newX + translateX, newY + translateY, p->z, p->color};
@@ -307,8 +349,6 @@ void drawTriangle(struct triangle *t, s16 color){
 }
 
 void fillTriangle(struct triangle *t, s16 color){
-	//s16 xMin, xMax, yMin, yMax;
-
 	//coords bounded box for a triangle
 	int sx1 = t->p1.x;
 	int sx2 = t->p2.x;
@@ -325,19 +365,25 @@ void fillTriangle(struct triangle *t, s16 color){
 	int x, y;
 	int e1, e2, e3;
 	struct point p;
+	p.z = t->p3.z; p.color = t->p3.color;
+	s16 seg1, seg2, seg3, seg4, seg5, seg6;
+	seg1 = (t->p1.x - t->p2.x); seg2 = (t->p1.y - t->p2.y);
+	seg3 = (t->p2.x - t->p3.x); seg4 = (t->p2.y - t->p3.y);
+	seg5 = (t->p3.x - t->p1.x); seg6 = (t->p3.y - t->p1.y);
+
 	for(y = yMin; y <= yMax; y++){
         	for(x = xMin; x <= xMax; x++){
             		//half-space functions
-			e1 = (t->p1.x - t->p2.x) * (y - t->p1.y) - (t->p1.y - t->p2.y) * (x - t->p1.x);
-			e2 = (t->p2.x - t->p3.x) * (y - t->p2.y) - (t->p2.y - t->p3.y) * (x - t->p2.x);
-			e3 = (t->p3.x - t->p1.x) * (y - t->p3.y) - (t->p3.y - t->p1.y) * (x - t->p3.x);
+			e1 = seg1 * (y - t->p1.y) - seg2 * (x - t->p1.x);
+			e2 = seg3 * (y - t->p2.y) - seg4 * (x - t->p2.x);
+			e3 = seg5 * (y - t->p3.y) - seg6 * (x - t->p3.x);
 
-			if( ((e1 > 0) && (e2 > 0) && (e3 > 0)) || ((e1 < 0) && (e2 < 0) && (e3 < 0)) ){
-               			p.x = x; p.y = y; p.z = t->p3.z; p.color = t->p3.color;
+			if(((e1 < 0) && (e2 < 0) && (e3 < 0)) ){
+			//if( ((e1 > 0) && (e2 > 0) && (e3 > 0)) || ((e1 < 0) && (e2 < 0) && (e3 < 0)) ){
+               			p.x = x; p.y = y;
 				setSanitizePixel(&p, color);
             		}
         	}	
     	}
-
 }
 
